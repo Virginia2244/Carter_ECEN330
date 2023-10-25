@@ -34,6 +34,7 @@ static tictactoe_location_t o_move;
 static tictactoe_location_t x_move;
 static tictactoe_board_t board;
 static bool player_is_x;
+static bool first_blood;
 
 bool check_touch_free(tictactoe_location_t *touch_point) {
   if (touchscreen_get_status()) {
@@ -49,6 +50,17 @@ bool check_touch_free(tictactoe_location_t *touch_point) {
     }
   }
   return false;
+}
+
+tictactoe_location_t ticTacToeControlComputeNextMove() {
+  if (first_blood) {
+    tictactoe_location_t point;
+    point.column = 0;
+    point.row = 0;
+    return point;
+  } else {
+    return minimax_computeNextMove(&board, true);
+  }
 }
 
 void clear_screen() {
@@ -163,6 +175,7 @@ void ticTacToeControl_tick() {
       player_is_x = false;
       wait_time = 0;
     }
+    first_blood = false;
     break;
   case X_TURN:
     if (player_is_x) {
@@ -173,7 +186,7 @@ void ticTacToeControl_tick() {
         game_control = CHECK_X;
       }
     } else {
-      x_move = minimax_computeNextMove(&board, true);
+      x_move = ticTacToeControlComputeNextMove();
       ticTacToeDisplay_drawX(x_move, false);
       board.squares[x_move.row][x_move.column] = MINIMAX_X_SQUARE;
       game_control = CHECK_X;
@@ -214,6 +227,7 @@ void ticTacToeControl_tick() {
       wait_time = 0;
       clear_screen();
       touchscreen_ack_touch();
+      first_blood = true;
     }
     break;
   }
