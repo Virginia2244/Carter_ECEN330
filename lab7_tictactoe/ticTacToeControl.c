@@ -55,8 +55,8 @@ bool check_touch_free(tictactoe_location_t *touch_point) {
 tictactoe_location_t ticTacToeControlComputeNextMove() {
   if (first_blood) {
     tictactoe_location_t point;
-    point.column = 0;
-    point.row = 0;
+    point.column = 2;
+    point.row = 2;
     return point;
   } else {
     return minimax_computeNextMove(&board, true);
@@ -184,12 +184,14 @@ void ticTacToeControl_tick() {
         board.squares[x_move.row][x_move.column] = MINIMAX_X_SQUARE;
         touchscreen_ack_touch();
         game_control = CHECK_X;
+        first_blood = false;
       }
     } else {
       x_move = ticTacToeControlComputeNextMove();
       ticTacToeDisplay_drawX(x_move, false);
       board.squares[x_move.row][x_move.column] = MINIMAX_X_SQUARE;
       game_control = CHECK_X;
+      first_blood = false;
     }
     break;
   case O_TURN:
@@ -242,7 +244,6 @@ void ticTacToeControl_tick() {
     wait_time++;
     break;
   case X_TURN:
-    first_blood = false;
     break;
   case O_TURN:
     break;
