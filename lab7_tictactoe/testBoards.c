@@ -77,6 +77,72 @@ void testBoards() {
   board5.squares[BOT][MID] = MINIMAX_EMPTY_SQUARE;
   board5.squares[BOT][RGT] = MINIMAX_EMPTY_SQUARE;
 
+  tictactoe_board_t board6;
+  board6.squares[TOP][LFT] = MINIMAX_O_SQUARE;
+  board6.squares[TOP][MID] = MINIMAX_X_SQUARE;
+  board6.squares[TOP][RGT] = MINIMAX_EMPTY_SQUARE;
+  board6.squares[MID][LFT] = MINIMAX_O_SQUARE;
+  board6.squares[MID][MID] = MINIMAX_X_SQUARE;
+  board6.squares[MID][RGT] = MINIMAX_EMPTY_SQUARE;
+  board6.squares[BOT][LFT] = MINIMAX_EMPTY_SQUARE;
+  board6.squares[BOT][MID] = MINIMAX_EMPTY_SQUARE;
+  board6.squares[BOT][RGT] = MINIMAX_EMPTY_SQUARE;
+
+  tictactoe_board_t board7;
+  board7.squares[TOP][LFT] = MINIMAX_EMPTY_SQUARE;
+  board7.squares[TOP][MID] = MINIMAX_O_SQUARE;
+  board7.squares[TOP][RGT] = MINIMAX_EMPTY_SQUARE;
+  board7.squares[MID][LFT] = MINIMAX_O_SQUARE;
+  board7.squares[MID][MID] = MINIMAX_EMPTY_SQUARE;
+  board7.squares[MID][RGT] = MINIMAX_X_SQUARE;
+  board7.squares[BOT][LFT] = MINIMAX_EMPTY_SQUARE;
+  board7.squares[BOT][MID] = MINIMAX_X_SQUARE;
+  board7.squares[BOT][RGT] = MINIMAX_EMPTY_SQUARE;
+
+  tictactoe_board_t board8;
+  board8.squares[TOP][LFT] = MINIMAX_X_SQUARE;
+  board8.squares[TOP][MID] = MINIMAX_EMPTY_SQUARE;
+  board8.squares[TOP][RGT] = MINIMAX_O_SQUARE;
+  board8.squares[MID][LFT] = MINIMAX_EMPTY_SQUARE;
+  board8.squares[MID][MID] = MINIMAX_EMPTY_SQUARE;
+  board8.squares[MID][RGT] = MINIMAX_EMPTY_SQUARE;
+  board8.squares[BOT][LFT] = MINIMAX_X_SQUARE;
+  board8.squares[BOT][MID] = MINIMAX_EMPTY_SQUARE;
+  board8.squares[BOT][RGT] = MINIMAX_O_SQUARE;
+
+  tictactoe_board_t board9;
+  board9.squares[TOP][LFT] = MINIMAX_O_SQUARE;
+  board9.squares[TOP][MID] = MINIMAX_EMPTY_SQUARE;
+  board9.squares[TOP][RGT] = MINIMAX_O_SQUARE;
+  board9.squares[MID][LFT] = MINIMAX_EMPTY_SQUARE;
+  board9.squares[MID][MID] = MINIMAX_X_SQUARE;
+  board9.squares[MID][RGT] = MINIMAX_X_SQUARE;
+  board9.squares[BOT][LFT] = MINIMAX_EMPTY_SQUARE;
+  board9.squares[BOT][MID] = MINIMAX_EMPTY_SQUARE;
+  board9.squares[BOT][RGT] = MINIMAX_O_SQUARE;
+
+  tictactoe_board_t board10;
+  board10.squares[TOP][LFT] = MINIMAX_X_SQUARE;
+  board10.squares[TOP][MID] = MINIMAX_EMPTY_SQUARE;
+  board10.squares[TOP][RGT] = MINIMAX_EMPTY_SQUARE;
+  board10.squares[MID][LFT] = MINIMAX_EMPTY_SQUARE;
+  board10.squares[MID][MID] = MINIMAX_EMPTY_SQUARE;
+  board10.squares[MID][RGT] = MINIMAX_X_SQUARE;
+  board10.squares[BOT][LFT] = MINIMAX_EMPTY_SQUARE;
+  board10.squares[BOT][MID] = MINIMAX_X_SQUARE;
+  board10.squares[BOT][RGT] = MINIMAX_EMPTY_SQUARE;
+
+  tictactoe_board_t board11;
+  board11.squares[TOP][LFT] = MINIMAX_X_SQUARE;
+  board11.squares[TOP][MID] = MINIMAX_X_SQUARE;
+  board11.squares[TOP][RGT] = MINIMAX_O_SQUARE;
+  board11.squares[MID][LFT] = MINIMAX_X_SQUARE;
+  board11.squares[MID][MID] = MINIMAX_O_SQUARE;
+  board11.squares[MID][RGT] = MINIMAX_O_SQUARE;
+  board11.squares[BOT][LFT] = MINIMAX_EMPTY_SQUARE;
+  board11.squares[BOT][MID] = MINIMAX_X_SQUARE;
+  board11.squares[BOT][RGT] = MINIMAX_EMPTY_SQUARE;
+
   tictactoe_location_t move;
 
   bool is_Xs_turn = true;
@@ -95,4 +161,22 @@ void testBoards() {
 
   move = minimax_computeNextMove(&board5, !is_Xs_turn);
   printf("next move for board5: (%d, %d)\n", move.row, move.column);
+
+  move = minimax_computeNextMove(&board6, is_Xs_turn);
+  printf("next move for board6: (%d, %d)\n", move.row, move.column);
+
+  move = minimax_computeNextMove(&board7, is_Xs_turn);
+  printf("next move for board7: (%d, %d)\n", move.row, move.column);
+
+  move = minimax_computeNextMove(&board8, is_Xs_turn);
+  printf("next move for board8: (%d, %d)\n", move.row, move.column);
+
+  move = minimax_computeNextMove(&board9, is_Xs_turn);
+  printf("next move for board9: (%d, %d)\n", move.row, move.column);
+
+  move = minimax_computeNextMove(&board10, is_Xs_turn);
+  printf("next move for board10: (%d, %d)\n", move.row, move.column);
+
+  move = minimax_computeNextMove(&board11, is_Xs_turn);
+  printf("next move for board11: (%d, %d)\n", move.row, move.column);
 }
