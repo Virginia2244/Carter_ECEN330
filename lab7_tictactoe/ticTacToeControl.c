@@ -175,7 +175,7 @@ void ticTacToeControl_tick() {
       player_is_x = false;
       wait_time = 0;
     }
-    first_blood = false;
+    first_blood = true;
     break;
   case X_TURN:
     if (player_is_x) {
@@ -227,7 +227,6 @@ void ticTacToeControl_tick() {
       wait_time = 0;
       clear_screen();
       touchscreen_ack_touch();
-      first_blood = true;
     }
     break;
   }
@@ -243,6 +242,7 @@ void ticTacToeControl_tick() {
     wait_time++;
     break;
   case X_TURN:
+    first_blood = false;
     break;
   case O_TURN:
     break;
