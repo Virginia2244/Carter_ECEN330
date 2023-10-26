@@ -78,7 +78,7 @@ int8_t minimax_recusive(tictactoe_board_t *board, bool is_Xs_turn) {
   location.row = localLocation.row;
   // Updates depth
   depth--;
-  return bestScore; // + (bestScore ? (bestScore > 0 ? -1 : 1) : 0);
+  return bestScore;
 }
 
 // This routine is not recursive but will invoke the recursive minimax
@@ -97,8 +97,6 @@ int8_t minimax_recusive(tictactoe_board_t *board, bool is_Xs_turn) {
 tictactoe_location_t minimax_computeNextMove(tictactoe_board_t *board,
                                              bool is_Xs_turn) {
   depth = -1;
-  // printBoard(board);
-  // printf("Final Score: %i\n", minimax_recusive(board, is_Xs_turn));
   minimax_recusive(board, is_Xs_turn);
   return location;
 }
@@ -187,6 +185,7 @@ minimax_score_t minimax_computeBoardScore(tictactoe_board_t *board,
   bool win = 0;
   // check Rows and collums
   for (int i = 0; i < TICTACTOE_BOARD_ROWS; i++) {
+    // If there is a win in either the rows or the column then record the win
     if (checkRow(board, is_Xs_turn, i) || checkColumn(board, is_Xs_turn, i)) {
       win = 1;
     }
