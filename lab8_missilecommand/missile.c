@@ -4,6 +4,12 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define SQRUARE_ROOT 2
+#define FIRST_THIRD (DISPLAY_WIDTH / 3)
+#define SECOND_THIRD (DISPLAY_WIDTH * 2 / 3)
+#define FIRST_BASE (DISPLAY_WIDTH / 6)
+#define SECOND_BASE ((DISPLAY_WIDTH / 3) + (DISPLAY_WIDTH / 6))
+#define THIRD_BASE ((DISPLAY_WIDTH * 2 / 3) + (DISPLAY_WIDTH / 6))
 #define MISSILE_PLAYER_SPEED 15
 #define MISSILE_ENEMY_SPEED 5
 #define MISSILE_SPEED                                                          \
@@ -32,8 +38,9 @@ typedef enum {
 void missile_init_all(missile_t *missile) {
   missile->length = 0;
   missile->explode_me = false;
-  missile->total_length = sqrt(pow((missile->x_dest - missile->x_origin), 2) +
-                               pow((missile->y_dest - missile->y_origin), 2));
+  missile->total_length =
+      sqrt(pow((missile->x_dest - missile->x_origin), SQRUARE_ROOT) +
+           pow((missile->y_dest - missile->y_origin), SQRUARE_ROOT));
   missile->x_current = missile->x_dest;
   missile->y_current = missile->y_dest;
   missile->impacted = false;
@@ -74,12 +81,12 @@ void missile_init_player(missile_t *missile, uint16_t x_dest, uint16_t y_dest) {
   missile->x_dest = x_dest;
   missile->y_dest = y_dest;
   missile->y_origin = DISPLAY_HEIGHT;
-  if (x_dest <= DISPLAY_WIDTH / 3) {
-    missile->x_origin = DISPLAY_WIDTH / 6;
-  } else if (x_dest <= DISPLAY_WIDTH * 2 / 3) {
-    missile->x_origin = (DISPLAY_WIDTH / 3) + (DISPLAY_WIDTH / 6);
+  if (x_dest <= FIRST_THIRD) {
+    missile->x_origin = FIRST_BASE;
+  } else if (x_dest <= SECOND_THIRD) {
+    missile->x_origin = SECOND_BASE;
   } else {
-    missile->x_origin = (DISPLAY_WIDTH * 2 / 3) + (DISPLAY_WIDTH / 6);
+    missile->x_origin = THIRD_BASE;
   }
   missile->currentState = MISSILE_STATE_FLYING;
   missile_init_all(missile);
