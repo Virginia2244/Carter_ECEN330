@@ -4,13 +4,17 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define MISSILE_SPEED 10
+#define MISSILE_PLAYER_SPEED 15
+#define MISSILE_ENEMY_SPEED 5
+#define MISSILE_SPEED                                                          \
+  ((missile->type == MISSILE_TYPE_PLAYER) ? MISSILE_PLAYER_SPEED               \
+                                          : MISSILE_ENEMY_SPEED)
 #define MISSILE_MAX_RADIUS 30
-#define MISSILE_EXPLOSION_RATE 5
+#define MISSILE_EXPLOSION_SPEED 5
 #define MISSILE_COLOR                                                          \
   (missile->type == MISSILE_TYPE_PLAYER                                        \
        ? DISPLAY_GREEN                                                         \
-       : (missile->type == MISSILE_TYPE_PLAYER ? DISPLAY_RED : DISPLAY_BLUE))
+       : (missile->type == MISSILE_TYPE_ENEMY ? DISPLAY_RED : DISPLAY_BLUE))
 
 typedef enum {
   MISSILE_STATE_DEAD,
@@ -42,10 +46,6 @@ void missile_init_all(missile_t *missile) {
 // aren't moving before they should.
 void missile_init_dead(missile_t *missile) {
   missile->currentState = MISSILE_STATE_DEAD;
-  // missile->x_dest = 0;
-  // missile->y_dest = 0;
-  // missile->x_origin = 100;
-  // missile->y_origin = 100;
   missile_init_all(missile);
 }
 
@@ -101,40 +101,30 @@ void missile_init_plane(missile_t *missile, int16_t plane_x, int16_t plane_y) {
 
 ////////// State Machine TICK Function //////////
 void missile_tick(missile_t *missile) {
-  // mealy output
+  // State changes and mealy outputs
   switch (missile->currentState) {
   case MISSILE_STATE_DEAD:
     break;
+
   case MISSILE_STATE_EXPLODING_GROWING:
     // If the missile is at the max size then start shrinking it, otherwise
     // increase the radius
     if (missile->radius == MISSILE_MAX_RADIUS) {
       missile->currentState = MISSILE_STATE_EXPLODING_SHRINKING;
-    } else {
-      missile->radius =
-          (missile->radius + MISSILE_EXPLOSION_RATE <= MISSILE_MAX_RADIUS)
-              ? (missile->radius + 5)
-              : MISSILE_MAX_RADIUS;
     }
-    // Draw the explosion
-    display_fillCircle(missile->x_current, missile->y_current, missile->radius,
-                       MISSILE_COLOR);
     break;
+
   case MISSILE_STATE_EXPLODING_SHRINKING:
-    // Clear the old explosion
-    display_fillCircle(missile->x_current, missile->y_current, missile->radius,
-                       DISPLAY_BLACK);
     // Calculate the new radius, if it is 0 then kill the missile
-    if (missile->radius - MISSILE_EXPLOSION_RATE <= 0) {
+    if ((missile->radius - MISSILE_EXPLOSION_SPEED) <= 0) {
+      // Clear the old explosion
+      display_fillCircle(missile->x_current, missile->y_current,
+                         missile->radius, DISPLAY_BLACK);
       missile->radius = 0;
       missile->currentState = MISSILE_STATE_DEAD;
-    } else {
-      missile->radius -= MISSILE_EXPLOSION_RATE;
-      // Draw the new explosion
-      display_fillCircle(missile->x_current, missile->y_current,
-                         missile->radius, MISSILE_COLOR);
     }
     break;
+
   case MISSILE_STATE_FLYING:
     // If it is time to explode or kill the missile do so, otherwise
     if (missile->explode_me) {
@@ -150,27 +140,56 @@ void missile_tick(missile_t *missile) {
       missile->currentState = (missile->type == MISSILE_TYPE_PLAYER)
                                   ? MISSILE_STATE_EXPLODING_GROWING
                                   : MISSILE_STATE_DEAD;
-    } else {
-      // Erase the previous line
-      display_drawLine(missile->x_current, missile->y_current,
-                       missile->x_origin, missile->y_origin, DISPLAY_BLACK);
-      // The missile length increases until it hits max length
-      missile->length =
-          (missile->length + MISSILE_SPEED < missile->total_length)
-              ? missile->length + MISSILE_SPEED
-              : missile->total_length;
-      // Calculate what percent of the total distance the missile has traveled
-      double percentage =
-          ((double)(missile->length) / (double)missile->total_length);
-      // Find the x and y positions of the missile
-      missile->x_current = missile->x_origin +
-                           percentage * (missile->x_dest - missile->x_origin);
-      missile->y_current = missile->y_origin +
-                           percentage * (missile->y_dest - missile->y_origin);
-      // Draw the new line
-      display_drawLine(missile->x_current, missile->y_current,
-                       missile->x_origin, missile->y_origin, MISSILE_COLOR);
     }
+    break;
+  }
+
+  // More outputs
+  switch (missile->currentState) {
+  case MISSILE_STATE_DEAD:
+    break;
+
+  case MISSILE_STATE_EXPLODING_GROWING:
+    // increase the radius
+    missile->radius =
+        ((missile->radius + MISSILE_EXPLOSION_SPEED) <= MISSILE_MAX_RADIUS)
+            ? (missile->radius + MISSILE_EXPLOSION_SPEED)
+            : MISSILE_MAX_RADIUS;
+    // Draw the explosion
+    display_fillCircle(missile->x_current, missile->y_current, missile->radius,
+                       MISSILE_COLOR);
+    break;
+
+  case MISSILE_STATE_EXPLODING_SHRINKING:
+    // Clear the old explosion
+    display_fillCircle(missile->x_current, missile->y_current, missile->radius,
+                       DISPLAY_BLACK);
+    // Decrease the radius
+    missile->radius -= MISSILE_EXPLOSION_SPEED;
+    // Draw the new explosion
+    display_fillCircle(missile->x_current, missile->y_current, missile->radius,
+                       MISSILE_COLOR);
+    break;
+
+  case MISSILE_STATE_FLYING:
+    // Erase the previous line
+    display_drawLine(missile->x_current, missile->y_current, missile->x_origin,
+                     missile->y_origin, DISPLAY_BLACK);
+    // The missile length increases until it hits max length
+    missile->length = (missile->length + MISSILE_SPEED < missile->total_length)
+                          ? missile->length + MISSILE_SPEED
+                          : missile->total_length;
+    // Calculate what percent of the total distance the missile has traveled
+    double percentage =
+        ((double)(missile->length) / (double)missile->total_length);
+    // Find the x and y positions of the missile
+    missile->x_current =
+        missile->x_origin + percentage * (missile->x_dest - missile->x_origin);
+    missile->y_current =
+        missile->y_origin + percentage * (missile->y_dest - missile->y_origin);
+    // Draw the new line
+    display_drawLine(missile->x_current, missile->y_current, missile->x_origin,
+                     missile->y_origin, MISSILE_COLOR);
     break;
   }
 }
