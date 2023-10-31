@@ -5,18 +5,28 @@
 #include <stdlib.h>
 
 #define SQRUARE_ROOT 2
+// Math for the starting locations of player missiles
 #define FIRST_THIRD (DISPLAY_WIDTH / 3)
 #define SECOND_THIRD (DISPLAY_WIDTH * 2 / 3)
 #define FIRST_BASE (DISPLAY_WIDTH / 6)
 #define SECOND_BASE ((DISPLAY_WIDTH / 3) + (DISPLAY_WIDTH / 6))
 #define THIRD_BASE ((DISPLAY_WIDTH * 2 / 3) + (DISPLAY_WIDTH / 6))
+
+// Math for starting location of enemy missiles
+#define ENEMY_MISSILE_Y_ZONE DISPLAY_HEIGHT / 5
+
+// Math for missile speeds
 #define MISSILE_PLAYER_SPEED 15
 #define MISSILE_ENEMY_SPEED 5
 #define MISSILE_SPEED                                                          \
   ((missile->type == MISSILE_TYPE_PLAYER) ? MISSILE_PLAYER_SPEED               \
                                           : MISSILE_ENEMY_SPEED)
+
+// Explosion params
 #define MISSILE_MAX_RADIUS 30
 #define MISSILE_EXPLOSION_SPEED 5
+
+// Missile colors
 #define MISSILE_COLOR                                                          \
   (missile->type == MISSILE_TYPE_PLAYER                                        \
        ? DISPLAY_GREEN                                                         \
@@ -64,7 +74,7 @@ void missile_init_dead(missile_t *missile) {
 void missile_init_enemy(missile_t *missile) {
   missile->type = MISSILE_TYPE_ENEMY;
   missile->x_origin = rand() % DISPLAY_WIDTH;
-  missile->y_origin = 0;
+  missile->y_origin = rand() % ENEMY_MISSILE_Y_ZONE;
   missile->x_dest = rand() % DISPLAY_WIDTH;
   missile->y_dest = DISPLAY_HEIGHT;
   missile->currentState = MISSILE_STATE_FLYING;
