@@ -81,6 +81,7 @@ void missile_init_player(missile_t *missile, uint16_t x_dest, uint16_t y_dest) {
   missile->x_dest = x_dest;
   missile->y_dest = y_dest;
   missile->y_origin = DISPLAY_HEIGHT;
+  // Making the start the nearest base to the the touched point
   if (x_dest <= FIRST_THIRD) {
     missile->x_origin = FIRST_BASE;
   } else if (x_dest <= SECOND_THIRD) {
