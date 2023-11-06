@@ -12,6 +12,9 @@ static missile_t plane_missiles[CONFIG_MAX_PLANE_MISSILES];
 // Initialize the game control logic
 // This function will initialize all missiles, stats, plane, etc.
 void gameControl_init() {
+  // Blank the screen.
+  display_fillScreen(DISPLAY_BLACK);
+
   // Initialize player missiles
   for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++)
     missile_init_dead(&player_missiles[i]);
@@ -32,13 +35,18 @@ void gameControl_init() {
 void gameControl_tick() {
   // Check for dead enemy missiles and re-initialize
   for (uint16_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++) {
+    // Checking if it is dead, if so re-initialze
     if (missile_is_dead(&enemy_missiles[i])) {
       missile_init_enemy(&enemy_missiles[i]);
     }
   }
 
+  // Handling touches on the touchscreen
   if (touchscreen_get_status() != TOUCHSCREEN_IDLE) {
+    // Itterating through all player missiles
     for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
+      // Checking to see if there is a missile that isn't dead. Either way
+      // acknoledge the touch
       if (missile_is_dead(&player_missiles[i])) {
         missile_init_player(&player_missiles[i], touchscreen_get_location().x,
                             touchscreen_get_location().y);
@@ -48,17 +56,22 @@ void gameControl_tick() {
     }
   }
 
+  // Checking to see if there is a collision
   for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
+    // Don't bother checking if the missile isn't exploding
     if (missile_is_dead(&player_missiles[i]) ||
         missile_is_flying(&player_missiles[i]))
       continue;
+    // Looping though all the enemy missiles
     for (uint16_t j = 0; j < CONFIG_MAX_ENEMY_MISSILES; j++) {
+      // If the missile is dead don't bother
       if (missile_is_dead(&enemy_missiles[i]))
         continue;
       int16_t delta_x =
           player_missiles[i].x_current - enemy_missiles[j].x_current;
       int16_t delta_y =
           player_missiles[i].y_current - enemy_missiles[j].y_current;
+      // Only explode if the missile is within the radius of the explosion
       if (((delta_x * delta_x) + (delta_y * delta_y)) <
           (player_missiles[i].radius * player_missiles[i].radius)) {
         missile_trigger_explosion(&enemy_missiles[j]);
