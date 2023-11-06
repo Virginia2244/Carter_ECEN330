@@ -44,7 +44,7 @@ void gameControl_tick() {
   }
 
   // Handling touches on the touchscreen
-  if (touchscreen_get_status() != TOUCHSCREEN_IDLE) {
+  if (touchscreen_get_status() == TOUCHSCREEN_RELEASED) {
     // Itterating through all player missiles
     for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
       // Checking to see if there is a missile that isn't dead. Either way
