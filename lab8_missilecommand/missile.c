@@ -1,4 +1,5 @@
 #include "missile.h"
+#include "config.h"
 #include "display.h"
 
 #include <math.h>
@@ -16,21 +17,17 @@
 #define ENEMY_MISSILE_Y_ZONE DISPLAY_HEIGHT / 5
 
 // Math for missile speeds
-#define MISSILE_PLAYER_SPEED 15
-#define MISSILE_ENEMY_SPEED 5
 #define MISSILE_SPEED                                                          \
-  ((missile->type == MISSILE_TYPE_PLAYER) ? MISSILE_PLAYER_SPEED               \
-                                          : MISSILE_ENEMY_SPEED)
-
-// Explosion params
-#define MISSILE_MAX_RADIUS 30
-#define MISSILE_EXPLOSION_SPEED 5
+  ((missile->type == MISSILE_TYPE_PLAYER)                                      \
+       ? CONFIG_PLAYER_MISSILE_DISTANCE_PER_TICK                               \
+       : CONFIG_ENEMY_MISSILE_DISTANCE_PER_TICK)
 
 // Missile colors
 #define MISSILE_COLOR                                                          \
   (missile->type == MISSILE_TYPE_PLAYER                                        \
-       ? DISPLAY_GREEN                                                         \
-       : (missile->type == MISSILE_TYPE_ENEMY ? DISPLAY_RED : DISPLAY_BLUE))
+       ? CONFIG_COLOR_PLAYER                                                   \
+       : (missile->type == MISSILE_TYPE_ENEMY ? CONFIG_COLOR_ENEMY             \
+                                              : CONFIG_COLOR_PLANE))
 
 typedef enum {
   MISSILE_STATE_DEAD,
@@ -127,14 +124,14 @@ void missile_tick(missile_t *missile) {
   case MISSILE_STATE_EXPLODING_GROWING:
     // If the missile is at the max size then start shrinking it, otherwise
     // increase the radius
-    if (missile->radius == MISSILE_MAX_RADIUS) {
+    if (missile->radius == CONFIG_EXPLOSION_MAX_RADIUS) {
       missile->currentState = MISSILE_STATE_EXPLODING_SHRINKING;
     }
     break;
 
   case MISSILE_STATE_EXPLODING_SHRINKING:
     // Calculate the new radius, if it is 0 then kill the missile
-    if ((missile->radius - MISSILE_EXPLOSION_SPEED) <= 0) {
+    if ((missile->radius - CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK) <= 0) {
       // Clear the old explosion
       display_fillCircle(missile->x_current, missile->y_current,
                          missile->radius, DISPLAY_BLACK);
@@ -170,9 +167,10 @@ void missile_tick(missile_t *missile) {
   case MISSILE_STATE_EXPLODING_GROWING:
     // increase the radius
     missile->radius =
-        ((missile->radius + MISSILE_EXPLOSION_SPEED) <= MISSILE_MAX_RADIUS)
-            ? (missile->radius + MISSILE_EXPLOSION_SPEED)
-            : MISSILE_MAX_RADIUS;
+        ((missile->radius + CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK) <=
+         CONFIG_EXPLOSION_MAX_RADIUS)
+            ? (missile->radius + CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK)
+            : CONFIG_EXPLOSION_MAX_RADIUS;
     // Draw the explosion
     display_fillCircle(missile->x_current, missile->y_current, missile->radius,
                        MISSILE_COLOR);
@@ -183,7 +181,7 @@ void missile_tick(missile_t *missile) {
     display_fillCircle(missile->x_current, missile->y_current, missile->radius,
                        DISPLAY_BLACK);
     // Decrease the radius
-    missile->radius -= MISSILE_EXPLOSION_SPEED;
+    missile->radius -= CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK;
     // Draw the new explosion
     display_fillCircle(missile->x_current, missile->y_current, missile->radius,
                        MISSILE_COLOR);
