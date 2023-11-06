@@ -5,10 +5,12 @@
 
 #include <stdio.h>
 
-static missile_t player_missiles[CONFIG_MAX_PLAYER_MISSILES];
-static missile_t enemy_missiles[CONFIG_MAX_ENEMY_MISSILES];
-static missile_t plane_missiles[CONFIG_MAX_PLANE_MISSILES];
-
+static missile_t missiles[CONFIG_MAX_TOTAL_MISSILES];
+static missile_t *enemy_missiles = &(missiles[0]);
+static missile_t *player_missiles = &(missiles[CONFIG_MAX_ENEMY_MISSILES]);
+static missile_t *plane_missiles =
+    &(missiles[CONFIG_MAX_ENEMY_MISSILES + CONFIG_MAX_PLAYER_MISSILES]);
+static bool tick_first_half = false;
 // Initialize the game control logic
 // This function will initialize all missiles, stats, plane, etc.
 void gameControl_init() {
@@ -79,15 +81,15 @@ void gameControl_tick() {
     }
   }
 
-  // Tick player missiles
-  for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++)
-    missile_tick(&player_missiles[i]);
-
-  // Tick enemy missiles
-  for (uint16_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++)
-    missile_tick(&enemy_missiles[i]);
-
-  // Tick plane missiles
-  for (uint16_t i = 0; i < CONFIG_MAX_PLANE_MISSILES; i++)
-    missile_tick(&plane_missiles[i]);
+  // Tick all missiles, half each time
+  if (tick_first_half)
+    // Tick the fist half
+    for (uint16_t i = 0; i < CONFIG_MAX_TOTAL_MISSILES / 2; i++)
+      missile_tick(&missiles[i]);
+  else
+    // Tick the second half
+    for (uint16_t i = CONFIG_MAX_TOTAL_MISSILES / 2;
+         i < CONFIG_MAX_TOTAL_MISSILES; i++)
+      missile_tick(&missiles[i]);
+  tick_first_half = !tick_first_half;
 }
