@@ -49,11 +49,11 @@ void gameControl_init() {
   // Initialize enemy missiles
   for (uint16_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++)
     missile_init_dead(&enemy_missiles[i]);
-
+#ifdef MISSILE_COMMAND_PART3
   // Initalize plane
   plane_init(
       &(missiles[CONFIG_MAX_ENEMY_MISSILES + CONFIG_MAX_PLAYER_MISSILES]));
-
+#endif
   // Initialize plane missiles
   for (uint16_t i = 0; i < CONFIG_MAX_PLANE_MISSILES; i++)
     missile_init_dead(&plane_missiles[i]);
@@ -90,34 +90,24 @@ void gameControl_tick() {
   }
 
   // Checking to see if there is a collision
-  for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
+  for (uint16_t i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
     // Don't bother checking if the missile isn't exploding
-    if (missile_is_dead(&player_missiles[i]) ||
-        missile_is_flying(&player_missiles[i]))
+    if (missile_is_dead(&missiles[i]) || missile_is_flying(&missiles[i]))
       continue;
     // Looping though all the enemy missiles
     for (uint16_t j = 0; j < CONFIG_MAX_ENEMY_MISSILES; j++) {
       // If the anything other than flying don't bother
-      if (!missile_is_flying(&enemy_missiles[i]))
+      if (!missile_is_flying(&enemy_missiles[j]))
         continue;
       // Only explode if the missile is within the radius of the explosion
       if (!enemy_missiles[j].impacted &&
-          check_collision(
-              player_missiles[i].x_current - enemy_missiles[j].x_current,
-              player_missiles[i].y_current - enemy_missiles[j].y_current,
-              player_missiles[i].radius)) {
+          check_collision(missiles[i].x_current - enemy_missiles[j].x_current,
+                          missiles[i].y_current - enemy_missiles[j].y_current,
+                          missiles[i].radius)) {
         missile_trigger_explosion(&enemy_missiles[j]);
         printScore(1);
         impacted++;
       }
-    }
-    // Checking the plane collision
-    if (check_collision(plane_getXY().x - player_missiles[i].x_current,
-                        plane_getXY().y - player_missiles[i].y_current,
-                        player_missiles[i].radius)) {
-      plane_explode();
-      printScore(1);
-      impacted++;
     }
 
     // Checking the plane missile collision
@@ -130,6 +120,16 @@ void gameControl_tick() {
       printScore(1);
       impacted++;
     }
+#ifdef MISSILE_COMMAND_PART3
+    // Checking the plane collision
+    if (check_collision(plane_getXY().x - missiles[i].x_current,
+                        plane_getXY().y - missiles[i].y_current,
+                        missiles[i].radius)) {
+      plane_explode();
+      printScore(1);
+      impacted++;
+    }
+#endif
   }
 
   // Tick all missiles, half each time
@@ -143,9 +143,10 @@ void gameControl_tick() {
       missile_tick(&missiles[i]);
   tick_first_half = !tick_first_half;
 
+#ifdef MISSILE_COMMAND_PART3
   // Tick plane
   plane_tick();
-
+#endif
   // Draw the score
   printScore(0);
 }
