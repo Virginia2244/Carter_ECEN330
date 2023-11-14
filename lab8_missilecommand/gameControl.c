@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 #define HALF_TOTAL_MISSILES (CONFIG_MAX_TOTAL_MISSILES / 2)
+#define TEXT_OFFSET 10
+#define IMPACTED_OFFSET (DISPLAY_WIDTH / 2)
 
 static uint16_t shot;
 static uint16_t impacted;
@@ -17,17 +19,19 @@ static missile_t *plane_missiles =
     &(missiles[CONFIG_MAX_ENEMY_MISSILES + CONFIG_MAX_PLAYER_MISSILES]);
 static bool tick_first_half = false;
 
+// Prints or clears the score
 void printScore(bool clear) {
   display_setTextColor(clear ? CONFIG_BACKGROUND_COLOR : DISPLAY_WHITE);
-  display_setCursor(10, 10);
+  display_setCursor(TEXT_OFFSET, TEXT_OFFSET);
   display_print("Shot: ");
   display_printDecimalInt(shot);
 
-  display_setCursor(DISPLAY_WIDTH / 2, 10);
+  display_setCursor(IMPACTED_OFFSET, TEXT_OFFSET);
   display_print("Impacted: ");
   display_printDecimalInt(impacted);
 }
 
+// Checks to see if there is a collision
 bool check_collision(int16_t delta_x, int16_t delta_y, double radius) {
   return ((delta_x * delta_x) + (delta_y * delta_y)) < (radius * radius);
 }
