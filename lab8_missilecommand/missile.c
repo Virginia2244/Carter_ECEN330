@@ -67,7 +67,6 @@ void missile_init_dead(missile_t *missile) {
 // randomly choose the origin and destination of the missile. The
 // origin should be somewhere near the top of the screen, and the
 // destination should be the very bottom of the screen.
-
 void missile_init_enemy(missile_t *missile) {
   missile->type = MISSILE_TYPE_ENEMY;
   missile->x_origin = rand() % DISPLAY_WIDTH;

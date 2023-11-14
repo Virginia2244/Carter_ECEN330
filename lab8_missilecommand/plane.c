@@ -7,6 +7,7 @@
 #define PLANE_HEIGHT 7
 #define PLANE_RAND_TIME_DEAD (((rand() % 100) / 20) / CONFIG_GAME_TIMER_PERIOD)
 
+// Plane state variable type
 typedef enum {
   PLANE_STATE_DEAD,
   PLANE_STATE_FLYING_LOADED,
@@ -20,12 +21,15 @@ static uint16_t plane_launch_x_cords;
 static uint16_t revive_time;
 static uint16_t time_dead;
 
+// Moves the plane accross the screen
 void move_plane() {
   plane_location.x -=
       CONFIG_PLANE_DISTANCE_PER_TICK; // TODO: impliment this better
 }
 
+// Draws or clears the plane
 void draw_plane(bool erase) {
+  // Decidinf if it should draw or erase the plane
   if (erase) {
     display_fillTriangle(
         plane_location.x, plane_location.y, plane_location.x + PLANE_DIAMETER,
@@ -63,6 +67,7 @@ void plane_tick() {
   // States and mealy outputs
   switch (plane) {
   case PLANE_STATE_DEAD:
+    // If the right amount of time has passed start the plane again
     if (time_dead >= revive_time) {
       plane = PLANE_STATE_FLYING_LOADED;
       plane_launch_x_cords = rand() % DISPLAY_WIDTH;
@@ -74,6 +79,8 @@ void plane_tick() {
     break;
 
   case PLANE_STATE_FLYING_LOADED:
+    // If the plane has passed the point it is supposed to launch the missile,
+    // launch the missile
     if ((plane_location.x <= plane_launch_x_cords) &&
         (missile_is_dead(global_plane_missile))) {
       missile_init_plane(global_plane_missile, plane_location.x,
@@ -83,6 +90,7 @@ void plane_tick() {
     break;
 
   case PLANE_STATE_FLYING_UNLOADED:
+    // If the plane has reached the end of it's path then kill it
     if (plane_location.x <= 0) {
       draw_plane(1);
       plane = PLANE_STATE_DEAD;
