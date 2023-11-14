@@ -8,12 +8,25 @@
 
 #define HALF_TOTAL_MISSILES (CONFIG_MAX_TOTAL_MISSILES / 2)
 
+static uint16_t shot;
+static uint16_t impacted;
 static missile_t missiles[CONFIG_MAX_TOTAL_MISSILES];
 static missile_t *enemy_missiles = &(missiles[0]);
 static missile_t *player_missiles = &(missiles[CONFIG_MAX_ENEMY_MISSILES]);
 static missile_t *plane_missiles =
     &(missiles[CONFIG_MAX_ENEMY_MISSILES + CONFIG_MAX_PLAYER_MISSILES]);
 static bool tick_first_half = false;
+
+void printScore(bool clear) {
+  display_setTextColor(clear ? CONFIG_BACKGROUND_COLOR : DISPLAY_WHITE);
+  display_setCursor(10, 10);
+  display_print("Shot: ");
+  display_printDecimalInt(shot);
+
+  display_setCursor(DISPLAY_WIDTH / 2, 10);
+  display_print("Impacted: ");
+  display_printDecimalInt(impacted);
+}
 
 bool check_collision(int16_t delta_x, int16_t delta_y, double radius) {
   return ((delta_x * delta_x) + (delta_y * delta_y)) < (radius * radius);
@@ -24,6 +37,10 @@ bool check_collision(int16_t delta_x, int16_t delta_y, double radius) {
 void gameControl_init() {
   // Blank the screen.
   display_fillScreen(DISPLAY_BLACK);
+  // Set and draw the score
+  shot = 0;
+  impacted = 0;
+  printScore(0);
 
   // Initialize player missiles
   for (uint16_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++)
@@ -64,10 +81,12 @@ void gameControl_tick() {
       if (missile_is_dead(&player_missiles[i])) {
         missile_init_player(&player_missiles[i], touchscreen_get_location().x,
                             touchscreen_get_location().y);
-        touchscreen_ack_touch();
+        printScore(1);
+        shot++;
         break;
       }
     }
+    touchscreen_ack_touch();
   }
 
   // Checking to see if there is a collision
@@ -78,15 +97,18 @@ void gameControl_tick() {
       continue;
     // Looping though all the enemy missiles
     for (uint16_t j = 0; j < CONFIG_MAX_ENEMY_MISSILES; j++) {
-      // If the missile is dead don't bother
-      if (missile_is_dead(&enemy_missiles[i]))
+      // If the anything other than flying don't bother
+      if (!missile_is_flying(&enemy_missiles[i]))
         continue;
       // Only explode if the missile is within the radius of the explosion
-      if (check_collision(
+      if (!enemy_missiles[j].impacted &&
+          check_collision(
               player_missiles[i].x_current - enemy_missiles[j].x_current,
               player_missiles[i].y_current - enemy_missiles[j].y_current,
               player_missiles[i].radius)) {
         missile_trigger_explosion(&enemy_missiles[j]);
+        printScore(1);
+        impacted++;
       }
     }
     // Checking the plane collision
@@ -94,14 +116,19 @@ void gameControl_tick() {
                         plane_getXY().y - player_missiles[i].y_current,
                         player_missiles[i].radius)) {
       plane_explode();
+      printScore(1);
+      impacted++;
     }
 
     // Checking the plane missile collision
-    if (check_collision(
+    if (!plane_missiles[0].impacted &&
+        check_collision(
             player_missiles[i].x_current - plane_missiles[0].x_current,
             player_missiles[i].y_current - plane_missiles[0].y_current,
             player_missiles[i].radius)) {
       missile_trigger_explosion(&plane_missiles[0]);
+      printScore(1);
+      impacted++;
     }
   }
 
@@ -118,4 +145,7 @@ void gameControl_tick() {
 
   // Tick plane
   plane_tick();
+
+  // Draw the score
+  printScore(0);
 }

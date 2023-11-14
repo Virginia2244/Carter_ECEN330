@@ -233,4 +233,5 @@ bool missile_is_flying(missile_t *missile) {
 // an explosion zone.
 void missile_trigger_explosion(missile_t *missile) {
   missile->explode_me = true;
+  missile->impacted = true;
 }
