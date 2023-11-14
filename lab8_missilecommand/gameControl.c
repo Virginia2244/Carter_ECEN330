@@ -53,9 +53,13 @@ void gameControl_init() {
   // Initialize enemy missiles
   for (uint16_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++)
     missile_init_dead(&enemy_missiles[i]);
+
+#ifdef LAB8_M3
   // Initalize plane
   plane_init(
       &(missiles[CONFIG_MAX_ENEMY_MISSILES + CONFIG_MAX_PLAYER_MISSILES]));
+#endif
+
   // Initialize plane missiles
   for (uint16_t i = 0; i < CONFIG_MAX_PLANE_MISSILES; i++)
     missile_init_dead(&plane_missiles[i]);
@@ -121,6 +125,7 @@ void gameControl_tick() {
       printScore(1);
       impacted++;
     }
+#ifdef LAB8_M3
     // Checking the plane collision
     if (check_collision(plane_getXY().x - missiles[i].x_current,
                         plane_getXY().y - missiles[i].y_current,
@@ -129,6 +134,7 @@ void gameControl_tick() {
       printScore(1);
       impacted++;
     }
+#endif
   }
 
   // Tick all missiles, half each time
@@ -142,8 +148,11 @@ void gameControl_tick() {
       missile_tick(&missiles[i]);
   tick_first_half = !tick_first_half;
 
+#ifdef LAB8_M3
   // Tick plane
   plane_tick();
+#endif
+
   // Draw the score
   printScore(0);
 }
