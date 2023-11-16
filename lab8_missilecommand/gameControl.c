@@ -81,6 +81,13 @@ void gameControl_tick() {
       missile_init_enemy(&enemy_missiles[i]);
     }
   }
+  if (missile_is_dead(&plane_missiles)) {
+    if (enemy_missiles[0].impacted) {
+      printScore(1);
+      impacted++;
+      enemy_missiles[0].impacted = false;
+    }
+  }
 
   // Handling touches on the touchscreen
   if (touchscreen_get_status() == TOUCHSCREEN_RELEASED) {
