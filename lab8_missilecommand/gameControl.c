@@ -70,6 +70,14 @@ void gameControl_init() {
 // This function should tick the missiles, handle screen touches, collisions,
 // and updating statistics.
 void gameControl_tick() {
+
+  if (missile_is_dead(&plane_missiles[0])) {
+    if (plane_missiles[0].impacted) {
+      printScore(1);
+      impacted++;
+      plane_missiles[0].impacted = false;
+    }
+  }
   // Check for dead enemy missiles and re-initialize
   for (uint16_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++) {
     // Checking if it is dead, if so re-initialze
@@ -79,13 +87,6 @@ void gameControl_tick() {
         impacted++;
       }
       missile_init_enemy(&enemy_missiles[i]);
-    }
-  }
-  if (missile_is_dead(&plane_missiles)) {
-    if (enemy_missiles[0].impacted) {
-      printScore(1);
-      impacted++;
-      enemy_missiles[0].impacted = false;
     }
   }
 
