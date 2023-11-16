@@ -96,6 +96,7 @@ void missile_init_player(missile_t *missile, uint16_t x_dest, uint16_t y_dest) {
     missile->x_origin = THIRD_BASE;
   }
   missile->currentState = MISSILE_STATE_FLYING;
+
   missile_init_all(missile);
 }
 
@@ -154,6 +155,7 @@ void missile_tick(missile_t *missile) {
       missile->currentState = (missile->type == MISSILE_TYPE_PLAYER)
                                   ? MISSILE_STATE_EXPLODING_GROWING
                                   : MISSILE_STATE_DEAD;
+      missile->impacted = true;
     }
     break;
   }
@@ -232,5 +234,4 @@ bool missile_is_flying(missile_t *missile) {
 // an explosion zone.
 void missile_trigger_explosion(missile_t *missile) {
   missile->explode_me = true;
-  missile->impacted = true;
 }

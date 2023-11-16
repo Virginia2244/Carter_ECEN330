@@ -74,6 +74,10 @@ void gameControl_tick() {
   for (uint16_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++) {
     // Checking if it is dead, if so re-initialze
     if (missile_is_dead(&enemy_missiles[i])) {
+      if (enemy_missiles[i].impacted) {
+        printScore(1);
+        impacted++;
+      }
       missile_init_enemy(&enemy_missiles[i]);
     }
   }
@@ -111,8 +115,6 @@ void gameControl_tick() {
                           missiles[i].y_current - enemy_missiles[j].y_current,
                           missiles[i].radius)) {
         missile_trigger_explosion(&enemy_missiles[j]);
-        printScore(1);
-        impacted++;
       }
     }
 
@@ -122,8 +124,6 @@ void gameControl_tick() {
                         missiles[i].y_current - plane_missiles[0].y_current,
                         missiles[i].radius)) {
       missile_trigger_explosion(&plane_missiles[0]);
-      printScore(1);
-      impacted++;
     }
 #ifdef LAB8_M3
     // Checking the plane collision
@@ -131,8 +131,6 @@ void gameControl_tick() {
                         plane_getXY().y - missiles[i].y_current,
                         missiles[i].radius)) {
       plane_explode();
-      printScore(1);
-      impacted++;
     }
 #endif
   }
