@@ -8,6 +8,9 @@
     "C_Cpp.clang_format_fallbackStyle": "LLVM",
     "files.associations": {
         "missile.h": "c",
-        "plane.h": "c"
+        "plane.h": "c",
+        "config.h": "c",
+        "display.h": "c",
+        "notes.h": "c"
     }
 }
