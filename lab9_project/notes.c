@@ -14,6 +14,9 @@
 void note_init(note_t *note) {
   note->y_current = 0;
   note->position = rand() % 0b10000;
+  if (!note->position) {
+    note->position = 1;
+  }
   note->state = NOTE_MOVING;
 }
 
@@ -53,6 +56,7 @@ void note_tick(note_t *note) {
   // mealy
   switch (note->state) {
   case NOTE_MOVING:
+    // If it is within 10 of the end then delete it
     if (note->y_current + 10 >= DISPLAY_HEIGHT) {
       draw_notes(note, false);
       note->state = NOTE_DEAD;
